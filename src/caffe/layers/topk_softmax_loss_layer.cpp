@@ -91,6 +91,13 @@ void TopkSoftmaxLossLayer<Dtype>::Backward_cpu(const vector<Blob<Dtype>*>& top,
     LOG(FATAL) << this->type()
                << " Layer cannot backpropagate to label inputs.";
   }
+  if (propagate_down[0]) {
+    const Dtype coeff = top[0]->cpu_diff()[0];
+    if (coeff != 1) {
+      Dtype* bottom_diff = bottom[0]->mutable_cpu_diff();
+      caffe_scal(bottom[0]->count(), coeff, bottom_diff);
+    }
+  }
 }
 
 #ifdef CPU_ONLY
