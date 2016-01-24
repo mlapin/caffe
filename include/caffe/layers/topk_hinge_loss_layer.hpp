@@ -1,5 +1,5 @@
-#ifndef CAFFE_TOPK_SOFTMAX_LOSS_LAYER_HPP_
-#define CAFFE_TOPK_SOFTMAX_LOSS_LAYER_HPP_
+#ifndef CAFFE_TOPK_HINGE_LOSS_LAYER_HPP_
+#define CAFFE_TOPK_HINGE_LOSS_LAYER_HPP_
 
 #include <vector>
 
@@ -11,18 +11,18 @@
 
 namespace caffe {
 
-// truncated top-k softmax loss (nonconvex for k > 1)
+// smooth top-k-of-hinge loss (top-k hinge beta)
 template <typename Dtype>
-class TopkSoftmaxLossLayer : public LossLayer<Dtype> {
+class TopkHingeLossLayer : public LossLayer<Dtype> {
  public:
-  explicit TopkSoftmaxLossLayer(const LayerParameter& param)
+   explicit TopkHingeLossLayer(const LayerParameter& param)
       : LossLayer<Dtype>(param) {}
   virtual void LayerSetUp(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
   virtual void Reshape(const vector<Blob<Dtype>*>& bottom,
       const vector<Blob<Dtype>*>& top);
 
-  virtual inline const char* type() const { return "TopkSoftmaxLoss"; }
+  virtual inline const char* type() const { return "TopkHingeLoss"; }
   virtual inline int ExactNumTopBlobs() const { return -1; }
   virtual inline int MinTopBlobs() const { return 1; }
   virtual inline int MaxTopBlobs() const { return 1; }
@@ -36,10 +36,13 @@ class TopkSoftmaxLossLayer : public LossLayer<Dtype> {
   int top_k_;
   int num_examples_;
   int num_classes_;
+  Dtype gamma_;
+  Dtype lo_;
+  Dtype hi_;
+  Dtype rhs_;
   std::vector<Dtype> scratch_;
-  std::vector<int> idx_;
 };
 
 }  // namespace caffe
 
-#endif  // CAFFE_TOPK_SOFTMAX_LOSS_LAYER_HPP_
+#endif  // CAFFE_TOPK_HINGE_LOSS_LAYER_HPP_
